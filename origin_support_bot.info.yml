@@ -3,4 +3,4 @@ type: module
 description: 'Embeds the Origin CMS support assistant chat widget for editors.'
 package: Origin
 core_version_requirement: ^10.3 || ^11
-version: '1.0.0'
+version: '1.1.0'

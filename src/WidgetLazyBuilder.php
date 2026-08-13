@@ -32,7 +32,8 @@ final class WidgetLazyBuilder implements TrustedCallbackInterface {
   public static function attach(): array {
     $build = ['#cache' => ['max-age' => 0]];
 
-    if (!\Drupal::currentUser()->hasPermission('use support assistant')) {
+    $user = \Drupal::currentUser();
+    if (!$user->hasPermission('use support assistant')) {
       return $build;
     }
 
@@ -53,7 +54,7 @@ final class WidgetLazyBuilder implements TrustedCallbackInterface {
           'endpoint' => _origin_support_bot_endpoint(),
           'siteId' => $site_id,
           'path' => $path,
-          'token' => self::signToken($secret, $site_id, $path),
+          'token' => self::signToken($secret, $site_id, $path, (string) $user->getEmail()),
         ],
       ],
     ];
@@ -67,17 +68,24 @@ final class WidgetLazyBuilder implements TrustedCallbackInterface {
    * composer dependency and stays byte-compatible with standard JWT
    * verifiers on the app side.
    */
-  private static function signToken(string $secret, string $site_id, string $path): string {
+  private static function signToken(string $secret, string $site_id, string $path, string $email): string {
     $now = \Drupal::time()->getRequestTime();
+    $claims = [
+      'site_id' => $site_id,
+      'path' => $path,
+      'role' => 'editor',
+      'iat' => $now,
+      'exp' => $now + self::TOKEN_TTL,
+    ];
+    // Signed identity for the in-app ticket form: the app trusts this claim
+    // as the Freshdesk requester, so it must come from the server-side
+    // account, never the browser. Omitted when the account has no email.
+    if ($email !== '') {
+      $claims['email'] = $email;
+    }
     $segments = [
       self::b64(json_encode(['alg' => 'HS256', 'typ' => 'JWT'])),
-      self::b64(json_encode([
-        'site_id' => $site_id,
-        'path' => $path,
-        'role' => 'editor',
-        'iat' => $now,
-        'exp' => $now + self::TOKEN_TTL,
-      ])),
+      self::b64(json_encode($claims)),
     ];
     $signature = hash_hmac('sha256', implode('.', $segments), $secret, TRUE);
     $segments[] = self::b64($signature);

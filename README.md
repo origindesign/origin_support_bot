@@ -3,8 +3,9 @@
 Embeds the Origin CMS support assistant chat widget for editors. All chat
 UI and bot logic live in the remote support-bot app — this module only:
 
-- signs a short-lived HS256 token (`site_id`, role, current path) so the
-  widget authenticates seamlessly and site identity can't be spoofed;
+- signs a short-lived HS256 token (`site_id`, role, current path, and the
+  user's email since 1.1.0) so the widget authenticates seamlessly and
+  neither site identity nor the ticket-form requester can be spoofed;
 - attaches the loader script (`<endpoint>/widget.js`) only for roles with
   the **Use support assistant** permission (anonymous users never load it);
 - injects `site_id`, current path, endpoint, and the token via
