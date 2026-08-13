@@ -1,0 +1,10 @@
+{
+    "name": "origindesign/origin_support_bot",
+    "description": "Embeds the Origin CMS support assistant chat widget for editors.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/origindesign/origin_support_bot",
+    "require": {
+        "php": ">=8.1"
+    }
+}

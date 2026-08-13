@@ -1,0 +1,3 @@
+use support assistant:
+  title: 'Use support assistant'
+  description: 'Load the Origin support chat widget on every page.'

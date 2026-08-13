@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Attaches the Origin support assistant widget for permitted users.
+ *
+ * All chat UI and bot logic live in the remote support-bot app; this module
+ * only signs a short-lived identity token and attaches the loader script.
+ */
+
+use Drupal\Core\Site\Settings;
+
+/**
+ * Fallback endpoint of the support-bot app (no trailing slash).
+ *
+ * Override per environment with $settings['support_bot_endpoint'].
+ */
+const ORIGIN_SUPPORT_BOT_DEFAULT_ENDPOINT = 'https://drupal-cms-support-agent.netlify.app';
+
+/**
+ * Returns the support-bot app endpoint, without a trailing slash.
+ */
+function _origin_support_bot_endpoint(): string {
+  $endpoint = Settings::get('support_bot_endpoint', ORIGIN_SUPPORT_BOT_DEFAULT_ENDPOINT);
+  return rtrim($endpoint, '/');
+}
+
+/**
+ * Implements hook_library_info_build().
+ *
+ * The loader URL depends on the configurable endpoint, so the library is
+ * declared here instead of a static libraries.yml. Changing the endpoint
+ * requires a cache rebuild (library definitions are cached).
+ */
+function origin_support_bot_library_info_build(): array {
+  return [
+    'widget' => [
+      'js' => [
+        _origin_support_bot_endpoint() . '/widget.js' => [
+          'type' => 'external',
+          'attributes' => ['defer' => TRUE],
+          'preprocess' => FALSE,
+          'minified' => TRUE,
+        ],
+      ],
+      'dependencies' => [
+        'core/drupalSettings',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_bottom().
+ *
+ * Adds an always-uncacheable lazy builder (auto-placeholdered via max-age 0
+ * inside the builder) so the signed token is minted fresh on every request
+ * and never frozen into page or dynamic page cache. Permission and
+ * configuration checks happen inside the builder.
+ */
+function origin_support_bot_page_bottom(array &$page_bottom): void {
+  $page_bottom['origin_support_bot'] = [
+    '#lazy_builder' => [
+      'Drupal\origin_support_bot\WidgetLazyBuilder::attach',
+      [],
+    ],
+    '#create_placeholder' => TRUE,
+  ];
+}
