@@ -38,7 +38,10 @@ final class WidgetLazyBuilder implements TrustedCallbackInterface {
     }
 
     $secret = Settings::get('support_bot_secret');
-    $site_id = getenv('PANTHEON_SITE_NAME') ?: Settings::get('support_bot_site_id');
+    // Explicit override wins: Lando's Pantheon recipe sets
+    // PANTHEON_SITE_NAME to the site UUID, not the machine name, so local
+    // dev needs $settings['support_bot_site_id'] to take precedence.
+    $site_id = Settings::get('support_bot_site_id') ?: getenv('PANTHEON_SITE_NAME');
     if (!$secret || !$site_id) {
       // Not configured for this environment; stay silent rather than break
       // page rendering.
