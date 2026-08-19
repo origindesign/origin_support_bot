@@ -44,7 +44,7 @@ If the secret or site id is missing the widget silently stays off.
 ## Endpoint override
 
 Defaults to the production app
-(`https://drupal-cms-support-agent.netlify.app` — update the constant in
+(`https://support.originoutside.com` — update the constant in
 `origin_support_bot.module` when the custom domain lands). Point local dev
 at a local app build
 (cache rebuild required — library definitions are cached):

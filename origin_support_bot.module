@@ -15,7 +15,7 @@ use Drupal\Core\Site\Settings;
  *
  * Override per environment with $settings['support_bot_endpoint'].
  */
-const ORIGIN_SUPPORT_BOT_DEFAULT_ENDPOINT = 'https://drupal-cms-support-agent.netlify.app';
+const ORIGIN_SUPPORT_BOT_DEFAULT_ENDPOINT = 'https://support.originoutside.com';
 
 /**
  * Returns the support-bot app endpoint, without a trailing slash.
