@@ -37,6 +37,15 @@ final class WidgetLazyBuilder implements TrustedCallbackInterface {
       return $build;
     }
 
+    // Admin pages only (decided 2026-08-19): several client sites pin their
+    // own visitor chat widget to the frontend's bottom corner, and the
+    // page-path context sent with each question is only meaningful on admin
+    // paths. Node/term edit forms use the admin theme on the starter kit,
+    // so editors keep the widget everywhere they actually work.
+    if (!\Drupal::service('router.admin_context')->isAdminRoute()) {
+      return $build;
+    }
+
     $secret = Settings::get('support_bot_secret');
     // Explicit override wins: Lando's Pantheon recipe sets
     // PANTHEON_SITE_NAME to the site UUID, not the machine name, so local
